@@ -31,5 +31,3 @@
       (products_assocs
         (products_per_customer_and_date
           (products_by_customer_and_date in)))))
-
-;; (-main "data/sample_transaction" "data/sample_result")
