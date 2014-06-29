@@ -3,6 +3,8 @@
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :aot [kaggle-challenge.core]
+  :main kaggle-challenge.core
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [cascalog/cascalog-core "2.1.0"]
                  [cascalog/cascalog-checkpoint "2.1.0"]
