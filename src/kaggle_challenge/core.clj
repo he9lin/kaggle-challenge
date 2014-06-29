@@ -28,6 +28,7 @@
 
 (defn -main [in out]
   (?- (hfs-delimited out)
-      (products_assocs
-        (products_per_customer_and_date
-          (products_by_customer_and_date in)))))
+      (->> in
+           products_by_customer_and_date
+           products_per_customer_and_date
+           products_assocs)))
