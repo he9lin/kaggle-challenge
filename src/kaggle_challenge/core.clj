@@ -10,25 +10,28 @@
 
 (def build-id #(s/join "-" %&))
 
-(defn products_by_customer_and_date [input]
-  (let [trans (hfs-delimited input :delimiter "," :skip-header? true)]
-    (<- [?customer-id-date ?product]
-        (trans ?customer-id _ _ ?category ?company ?brand ?date _ _ _ _)
-        (build-id ?customer-id ?date :> ?customer-id-date)
-        (build-id ?category ?company ?brand :> ?product))))
+(defn products_by_customer_and_date [in]
+  (<- [?customer-id-date ?product]
+      (in ?customer-id _ _ ?category ?company ?brand ?date _ _ _ _)
+      (build-id ?customer-id ?date :> ?customer-id-date)
+      (build-id ?category ?company ?brand :> ?product)))
 
 (defn products_per_customer_and_date [input]
   (<- [?customer-id-date ?products]
       (input ?customer-id-date ?product)
       (doaccum ?product :> ?products)))
 
-(defn products_assocs [input]
+(defn select_products [input]
   (<- [?products]
       (input _ ?products)))
 
+(defn products_assocs [in]
+  (->> in
+       products_by_customer_and_date
+       products_per_customer_and_date
+       select_products))
+
 (defn -main [in out]
-  (?- (hfs-delimited out)
-      (->> in
-           products_by_customer_and_date
-           products_per_customer_and_date
-           products_assocs)))
+  (let [in (hfs-delimited in :delimiter "," :skip-header? true)]
+    (?- (hfs-delimited out)
+        (products_assocs in))))
