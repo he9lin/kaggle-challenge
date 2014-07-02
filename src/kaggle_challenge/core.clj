@@ -45,7 +45,13 @@
          (skips_products
             (products_by_customer_and_date in) skips))))))
 
-(defn -main [in out]
-  (let [in (hfs-delimited in :delimiter "," :skip-header? true)]
-    (?- (hfs-delimited out)
-        (products_assocs in))))
+(defn -main
+  ([in out]
+    (let [in (hfs-delimited in :delimiter "," :skip-header? true)]
+      (?- (hfs-delimited out)
+          (products_assocs in))))
+  ([in skips out]
+    (let [in (hfs-delimited in :delimiter "," :skip-header? true)
+          skips (hfs-delimited skips :delimiter "," :skip-header? true)]
+      (?- (hfs-delimited out)
+          (products_assocs in skips)))))
