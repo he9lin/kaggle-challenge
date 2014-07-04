@@ -10,40 +10,47 @@
 
 (def build-id #(s/join "-" %&))
 
-(defn products_by_customer_and_date [in]
-  (<- [?customer-id-date ?product]
+(defn build-customer-id-date-key [in build-item-id-fn]
+  (<- [?customer-id-date ?item]
       (in ?customer-id _ _ ?category ?company ?brand ?date _ _ _ _)
       (build-id ?customer-id ?date :> ?customer-id-date)
-      (build-id ?category ?company ?brand :> ?product)))
+      (build-item-id-fn ?category ?company ?brand :> ?item)))
 
-(defn products_per_customer_and_date [in]
-  (<- [?customer-id-date ?products]
-      (in ?customer-id-date ?product)
-      (doaccum ?product :> ?products)))
+(defn group_by_id [in]
+  (<- [?id ?items]
+      (in ?id ?item)
+      (doaccum ?item :> ?items)))
 
-(defn select_products [input]
-  (<- [?products]
-      (input _ ?products)))
+(defn remove_id [input]
+  (<- [?items] (input _ ?items)))
 
-(defn skips_products [in skips]
-  (<- [?customer-id-date ?product]
-      (in ?customer-id-date ?product)
-      (skips ?product :> true)))
+(defn skip_items [in skips]
+  (<- [?customer-id-date ?item]
+      (in ?customer-id-date ?item)
+      (skips ?item :> true)))
 
-(defn products_assocs
-  ([in]
-   (->> in
-        products_by_customer_and_date
-        products_per_customer_and_date
-        select_products))
-  ([in skips]
-   (let [skips (<- [?product]
-                   (skips _ ?category _ ?company _ ?brand)
-                   (build-id ?category ?company ?brand :> ?product))]
-     (select_products
-       (products_per_customer_and_date
-         (skips_products
-            (products_by_customer_and_date in) skips))))))
+(defn items_to_skip [skips build-item-id-fn]
+  (<- [?item]
+      (skips _ ?category _ ?company _ ?brand)
+      (build-item-id-fn ?category ?company ?brand :> ?item)))
+
+(defn items_assocs
+  ([in build-item-id-fn]
+   (remove_id
+     (group_by_id
+        (build-customer-id-date-key in build-item-id-fn))))
+  ([in skips build-item-id-fn]
+   (let [skips (items_to_skip skips build-item-id-fn)]
+     (remove_id
+       (group_by_id
+         (skip_items
+            (build-customer-id-date-key in build-item-id-fn) skips))))))
+
+(defn products_assocs [& params]
+  (apply items_assocs (into (vec params) [#'build-id])))
+
+; (defn brands_assocs [& params]
+;   (apply items_assocs (into (vec params) [#'build-brand-id])))
 
 (defn -main [in out]
   (let [in (hfs-delimited in :delimiter "," :skip-header? true)]
