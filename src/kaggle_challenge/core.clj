@@ -52,7 +52,13 @@
 ; (defn brands_assocs [& params]
 ;   (apply items_assocs (into (vec params) [#'build-brand-id])))
 
-(defn -main [in out]
-  (let [in (hfs-delimited in :delimiter "," :skip-header? true)]
-    (?- (hfs-delimited out)
-        (products_assocs in))))
+(defn -main
+  ([in out]
+    (let [in (hfs-delimited in :delimiter "," :skip-header? true)]
+      (?- (hfs-delimited out)
+          (products_assocs in))))
+  ([in skips out]
+    (let [in (hfs-delimited in :delimiter "," :skip-header? true)
+          skips (hfs-delimited skips :delimiter "," :skip-header? true)]
+      (?- (hfs-delimited out)
+          (products_assocs in skips)))))
