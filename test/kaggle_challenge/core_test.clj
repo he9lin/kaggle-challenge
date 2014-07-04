@@ -4,6 +4,20 @@
   (:require [clojure.test :refer :all]
             [kaggle-challenge.core :refer :all]))
 
+
+(deftest brands-assocs-test
+  (let [in (hfs-delimited "data/sample_transactions.csv"
+                          :delimiter ","
+                          :skip-header? true)]
+    (fact (brands_assocs in) =>
+      (produces
+        [["5174,5122"]
+         ["10522,2248"]
+         ["2248"]
+         ["5174"]
+         ["5072,16139"]
+         ["16139,10522,5174"]]))))
+
 (deftest products-assocs-test
   (let [in (hfs-delimited "data/sample_transactions.csv"
                           :delimiter ","
