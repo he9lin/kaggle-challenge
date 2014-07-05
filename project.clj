@@ -8,7 +8,8 @@
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [cascalog/cascalog-core "2.1.0"]
                  [cascalog/cascalog-checkpoint "2.1.0"]
-                 [cascalog/cascalog-more-taps "2.1.0"]]
+                 [cascalog/cascalog-more-taps "2.1.0"]
+                 [clj-time "0.7.0"]]
   :jvm-opts ["-Xms768m" "-Xmx768m"]
   :profiles {
              :provided {:dependencies [[org.apache.hadoop/hadoop-core "1.1.2"]]}
