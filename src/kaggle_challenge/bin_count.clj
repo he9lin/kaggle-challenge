@@ -25,7 +25,7 @@
         date2 (convert-arg date2)]
     (t/in-days (t/interval date1 date2))))
 
-(def bins [1 3 7 9 30])
+(def bins [1 3 7 30 90 180])
 (def bin-vars (vec (map #(str "?a" %) bins)))
 
 (defn num-bucket [num bins]
@@ -44,31 +44,34 @@
 (defn find-bin-for-value [v]
   (if (nil? v) nil (num-bucket v bins)))
 
+(def agg-bins-base
+  (into (into [] (replicate (count bins) 0)) [nil]))
+
 (defaggregatefn agg-bins
-  ([] [0 0 0 0 0 nil])
+  ([] agg-bins-base)
   ([total value]
    (let [prev-value (last total)
          bin        (find-bin-for-value (days-between-dates prev-value value))
          index      (index-of-bin bin)]
      (assoc
        (if (== index -1) total (assoc total index (+ (total index) 1)))
-       5 value)))
+       (count bins) value)))
   ([total] [total]))
 
 (def vars (into bin-vars ["?s"]))
-
-(defn count-bins [in]
-  (<- [?cust ?a1 ?a3 ?a7 ?a9 ?a30 ?s]
-    (in ?cust ?date)
-    (agg-bins :< ?date :>> vars)))
 
 (defn select-customer-and-date [in]
   (<- [?cust ?date]
     (in ?cust _ _ _ _ _ ?date _ _ _ _)))
 
+(defn count-bins [in]
+  (<- [?cust ?a1 ?a3 ?a7 ?a30 ?a90 ?a180 ?s]
+    (in ?cust ?date)
+    (agg-bins :< ?date :>> vars)))
+
 (defn clean [in]
-  (<- [?cust ?a1 ?a3 ?a7 ?a9 ?a30]
-      (in ?cust ?a1 ?a3 ?a7 ?a9 ?a30 _)))
+  (<- [?cust ?a1 ?a3 ?a7 ?a30 ?a90 ?a180]
+      (in ?cust ?a1 ?a3 ?a7 ?a30 ?a90 ?a180 _)))
 
 (defn run-bin-count [in]
   (->> in
