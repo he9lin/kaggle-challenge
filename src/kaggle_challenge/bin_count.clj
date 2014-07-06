@@ -42,7 +42,7 @@
       (catch Exception e nil))))
 
 (defn find-bin-for-value [v]
-  (if (nil? v) nil (num-bucket v bins)))
+  (if (or (nil? v) (zero? v)) nil (num-bucket v bins)))
 
 (def agg-bins-base
   (into (into [] (replicate (count bins) 0)) [nil]))
