@@ -15,9 +15,15 @@
   ([in out]
     (let [in (hfs-delimited in :delimiter "," :skip-header? true)]
       (?- (hfs-delimited out)
-          (brands-assocs in))))
-  ([in skips out]
-    (let [in (hfs-delimited in :delimiter "," :skip-header? true)
-          skips (hfs-delimited skips :delimiter "," :skip-header? true)]
-      (?- (hfs-delimited out)
-          (brands-assocs in skips)))))
+          (run-bin-count in))))
+
+;; (defn -main
+;;   ([in out]
+;;     (let [in (hfs-delimited in :delimiter "," :skip-header? true)]
+;;       (?- (hfs-delimited out)
+;;           (brands-assocs in))))
+;;   ([in skips out]
+;;     (let [in (hfs-delimited in :delimiter "," :skip-header? true)
+;;           skips (hfs-delimited skips :delimiter "," :skip-header? true)]
+;;       (?- (hfs-delimited out)
+;;           (brands-assocs in skips)))))
