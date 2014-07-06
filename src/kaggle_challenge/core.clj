@@ -3,6 +3,7 @@
         [cascalog.checkpoint]
         [cascalog.more-taps :only (hfs-delimited)])
   (:require [kaggle-challenge.assocs :refer :all]
+            [kaggle-challenge.bin-count :refer :all]
             [clojure.string :as s]
             [cascalog.logic [ops :as c] [vars :as v]])
   (:gen-class))
@@ -15,7 +16,7 @@
   ([in out]
     (let [in (hfs-delimited in :delimiter "," :skip-header? true)]
       (?- (hfs-delimited out)
-          (run-bin-count in))))
+          (run-bin-count in)))))
 
 ;; (defn -main
 ;;   ([in out]
