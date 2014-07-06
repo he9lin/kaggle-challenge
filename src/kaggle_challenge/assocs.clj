@@ -16,15 +16,15 @@
       (build-id ?customer-id ?date :> ?customer-id-date)
       (build-item-id-fn ?category ?company ?brand :> ?item)))
 
-(defn group_by_id [in]
+(defn group-by-id [in]
   (<- [?id ?items]
       (in ?id ?item)
       (doaccum ?item :> ?items)))
 
-(defn remove_id [input]
+(defn remove-id [input]
   (<- [?items] (input _ ?items)))
 
-(defn skip_items [in skips]
+(defn skip-items [in skips]
   (<- [?customer-id-date ?item]
       (in ?customer-id-date ?item)
       (skips ?item :> true)))
@@ -34,22 +34,22 @@
       (skips _ ?category _ ?company _ ?brand)
       (build-item-id-fn ?category ?company ?brand :> ?item)))
 
-(defn items_assocs
+(defn items-assocs
   ([in build-item-id-fn]
-   (remove_id
-     (group_by_id
+   (remove-id
+     (group-by-id
         (build-customer-id-date-key in build-item-id-fn))))
   ([in skips build-item-id-fn]
    (let [skips (items_to_skip skips build-item-id-fn)]
-     (remove_id
-       (group_by_id
-         (skip_items
+     (remove-id
+       (group-by-id
+         (skip-items
             (build-customer-id-date-key in build-item-id-fn) skips))))))
 
 (defn build-brand-id [cate company brand] brand)
 
-(defn products_assocs [& params]
-  (apply items_assocs (into (vec params) [#'build-id])))
+(defn products-assocs [& params]
+  (apply items-assocs (into (vec params) [#'build-id])))
 
-(defn brands_assocs [& params]
-  (apply items_assocs (into (vec params) [#'build-brand-id])))
+(defn brands-assocs [& params]
+  (apply items-assocs (into (vec params) [#'build-brand-id])))

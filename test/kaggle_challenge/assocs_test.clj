@@ -8,7 +8,7 @@
   (let [in (hfs-delimited "data/sample_transactions.csv"
                           :delimiter ","
                           :skip-header? true)]
-    (fact (brands_assocs in) =>
+    (fact (brands-assocs in) =>
       (produces
         [["5174,5122"]
          ["10522,2248"]
@@ -21,7 +21,7 @@
   (let [in (hfs-delimited "data/sample_transactions.csv"
                           :delimiter ","
                           :skip-header? true)]
-    (fact (products_assocs in) =>
+    (fact (products-assocs in) =>
       (produces
         [
          ["2210-103700030-5174,2222-103700030-5122"]
@@ -38,7 +38,7 @@
         skips (hfs-delimited "data/offers.csv"
                              :delimiter ","
                              :skip-header? true)]
-    (fact (products_assocs in skips) =>
+    (fact (products-assocs in skips) =>
       (produces
         [
          ["2210-103700030-5174,2222-103700030-5122"]
