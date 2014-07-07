@@ -81,8 +81,8 @@
        count-bins
        clean))
 
-(def transactions (hfs-delimited "data/sample_transactions2.csv"
-                                 :delimiter ","
-                                 :skip-header? true))
-
-(?- (stdout) (run-bin-count transactions))
+;; (def transactions (hfs-delimited "data/sample_transactions2.csv"
+;;                                  :delimiter ","
+;;                                  :skip-header? true))
+;;
+;; (?- (stdout) (run-bin-count transactions))
