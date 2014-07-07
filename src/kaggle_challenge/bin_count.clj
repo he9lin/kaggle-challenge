@@ -26,7 +26,7 @@
     (t/in-days (t/interval date1 date2))))
 
 (def bins [1 3 7 30 90 180])
-(def bin-vars (vec (map #(str "?a" %) bins)))
+(def bin-vars (v/gen-nullable-vars (count bins)))
 
 (defn num-bucket [num bins]
   (find-first (partial <= num) bins))
@@ -65,13 +65,15 @@
     (in ?cust _ _ _ _ _ ?date _ _ _ _)))
 
 (defn count-bins [in]
-  (<- [?cust ?a1 ?a3 ?a7 ?a30 ?a90 ?a180 ?s]
-    (in ?cust ?date)
-    (agg-bins :< ?date :>> vars)))
+  (let [out-vars (into ["?cust"] vars)]
+    (<- out-vars
+      (in ?cust ?date)
+      (agg-bins :< ?date :>> vars))))
 
 (defn clean [in]
-  (<- [?cust ?a1 ?a3 ?a7 ?a30 ?a90 ?a180]
-      (in ?cust ?a1 ?a3 ?a7 ?a30 ?a90 ?a180 _)))
+  (let [out-vars (into ["?cust"] bin-vars)]
+    (<- out-vars
+      (in :>> (into out-vars ["_"])))))
 
 (defn run-bin-count [in]
   (->> in
@@ -79,8 +81,8 @@
        count-bins
        clean))
 
-;; (def transactions (hfs-delimited "data/sample_transactions2.csv"
-;;                                  :delimiter ","
-;;                                  :skip-header? true))
-;;
-;; (?- (stdout) (run-bin-count transactions))
+(def transactions (hfs-delimited "data/sample_transactions2.csv"
+                                 :delimiter ","
+                                 :skip-header? true))
+
+(?- (stdout) (run-bin-count transactions))
